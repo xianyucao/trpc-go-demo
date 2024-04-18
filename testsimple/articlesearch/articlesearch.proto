@@ -1,0 +1,26 @@
+syntax = "proto3";
+//trpc create -f --protofile=articlesearch.proto --protocol=trpc --rpconly --nogomod --mock=false
+package articlesearch;
+option go_package = "./articlesearch";
+// 定义文章服务
+service Article {
+  // 搜索文章的RPC方法
+  rpc SearchArticles(SearchRequest) returns (SearchResponse);// @alias=/articlesearch
+}
+
+// 搜索请求消息定义
+message SearchRequest {
+  string query = 1; // 搜索查询的关键词
+}
+
+// 文章信息消息定义
+message Article {
+  int32 id = 1; // 文章ID
+  string title = 2; // 文章标题
+  string content = 3; // 文章内容
+}
+
+// 搜索响应消息定义
+message SearchResponse {
+  repeated Article articles = 1; // 返回的文章列表
+}

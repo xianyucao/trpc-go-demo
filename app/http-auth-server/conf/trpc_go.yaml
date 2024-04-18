@@ -1,0 +1,66 @@
+server:
+  filter:
+    - elapse
+    - count
+    - tracelog
+    - err_to_code
+  timeout: 2000
+  service:
+    - name: demo.httpauth.Auth
+      ip: 127.0.0.1
+      # nic: eth0
+      port: 8001
+      network: tcp
+      protocol: http
+      timeout: 1800
+
+
+plugins:
+  log:
+    default:
+      - writer: console
+        level: debug
+        formatter: console
+      - writer: file
+        level: debug
+        formatter: json
+        formatter_config:
+          time_fmt: 2006-01-02 15:04:05
+          time_key: time
+          level_key: level
+          name_key: none
+          caller_key: caller
+          message_key: message
+          stacktrace_key: stack_trace
+        writer_config:
+          log_path: ./log/
+          filename: trpc.log
+          write_mode: 2
+          roll_type: size
+          max_size: 1000
+          max_backups: 10
+
+  metrics:
+    log:
+      name: demo.httpauth.Auth
+
+  config:
+    etcd:
+      endpoints:
+        - host.docker.internal:21379
+        - host.docker.internal:22379
+        - host.docker.internal:23379
+      dialtimeout: 5s
+
+client:
+  filter:
+    - tracelog
+  timeout: 3000
+  service:
+    - name: demo.account.User
+      target: ip://127.0.0.1:8002
+      network: tcp
+      protocol: trpc
+      timeout: 1000
+      filter:
+        - err_to_code
